@@ -10,7 +10,7 @@
         }
     ],
     "autoload": {
-        "psr-4": {"Comos\\Config\\": "src"}
+        "psr-4": {"Comos\\Drapper\\": "src"}
     },
     "require": {
         "php":">5.5"
