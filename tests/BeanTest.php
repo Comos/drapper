@@ -39,6 +39,7 @@ class BeanTest extends \PHPUnit_Framework_TestCase
         return [
             //$method, $data, $key, $default, $expectedValue
             ['str', ['a' => '1', 'b' => 2], 'a', null, '1'],
+            ['str', ['a' => '1', 'b' => null], 'b', null, null],
             ['str', ['a' => '1', 'b' => 2], 'b', null, '2'],
             ['str', ['a' => '1', 'b' => 2], 'c', null, null],
             ['str', ['a' => new __StringObj(), 'b' => 2], 'a', null, 'x'],

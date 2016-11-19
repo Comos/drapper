@@ -58,6 +58,14 @@ class Bean
     }
 
     /**
+     * @return BeanList
+     */
+    public function beanList($key)
+    {
+
+    }
+
+    /**
      * @return array
      */
     public function keys()
@@ -94,7 +102,14 @@ class Bean
         if (!array_key_exists($key, $this->data)) {
             return $default;
         }
+
         $value = $this->data[$key];
+
+        if (is_null($value)) {
+            return null;
+        }
+
+
         if (is_string($value)) {
             return $value;
         }
@@ -115,6 +130,11 @@ class Bean
             return $default;
         }
         $value = $this->data[$key];
+
+        if (is_null($value)) {
+            return null;
+        }
+
         if (is_int($value)) {
             return $value;
         }
@@ -130,12 +150,23 @@ class Bean
         throw new Exception('type error, field: ' . $key);
     }
 
+    /**
+     * @param $key
+     * @param mixed $default
+     * @return float|null
+     * @throws Exception
+     */
     public function float($key, $default = null)
     {
         if (!array_key_exists($key, $this->data)) {
             return $default;
         }
         $value = $this->data[$key];
+
+        if (is_null($value)) {
+            return null;
+        }
+
         if (is_float($value)) {
             return $value;
         }
@@ -151,12 +182,23 @@ class Bean
         throw new Exception('type error, field: ' . $key);
     }
 
+    /**
+     * @param $key
+     * @param mixed $default
+     * @return bool|null
+     * @throws Exception
+     */
     public function bool($key, $default = null)
     {
         if (!array_key_exists($key, $this->data)) {
             return $default;
         }
         $value = $this->data[$key];
+
+        if (is_null($value)) {
+            return null;
+        }
+        
         if (is_bool($value)) {
             return $value;
         }
@@ -176,7 +218,7 @@ class Bean
     }
 
     /**
-     * get string field value in restrict mode.
+     * get string field value in strict mode.
      * @param mixed $key
      * @throws Exception
      * @return string
