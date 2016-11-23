@@ -8,29 +8,29 @@
 
 namespace Comos\Drapper;
 
-class Bean
+use Comos\Drapper\Exceptions\Exception;
+use Comos\Drapper\Exceptions\TypeErrorException;
+
+class Bean extends DataContainer
 {
+
+
     /**
-     *
-     * @var array
+     * @var Collection
      */
-    protected $data;
-    /**
-     * @var Bean[]
-     */
-    protected $subs;
+    protected $subCollections;
 
     /**
      * @param array|\ArrayAccess $data
      * @return Bean
-     * @throws \InvalidArgumentException
+     * @throws TypeErrorException
      */
     public static function fromArray($data)
     {
         if (!is_array($data) && !$data instanceof \ArrayAccess) {
-            throw new \InvalidArgumentException('the argument must be array or ArrayAccess');
+            throw new TypeErrorException('the argument must be array or ArrayAccess');
         }
-        return new self($data);
+        return new Bean($data);
     }
 
     /**
@@ -44,7 +44,7 @@ class Bean
 
     public function strictSub($key) {
         if (!isset($this->subs[$key])) {
-            $this->subs[$key] = $this->genSub($key, true);
+            $this->subs[$key] = $this->generateSubBean($key, true);
         }
         return $this->subs[$key];
     }
@@ -52,17 +52,21 @@ class Bean
     public function sub($key)
     {
         if (!isset($this->subs[$key])) {
-            $this->subs[$key] = $this->genSub($key);
+            $this->subs[$key] = $this->generateSubBean($key);
         }
         return $this->subs[$key];
     }
 
     /**
-     * @return BeanList
+     * @return Collection
      */
-    public function beanList($key)
+    public function collection($key)
     {
-
+        if (!isset($this->subCollections[$key])) {
+            $data = isset($this->data[$key]) ? $this->data[$key] : [];
+            $this->subCollections[$key] = Collection::fromArray($data);
+        }
+        return $this->subCollections[$key];
     }
 
     /**
@@ -71,24 +75,6 @@ class Bean
     public function keys()
     {
         return array_keys($this->data);
-    }
-
-    protected function genSub($key, $restrict = false)
-    {
-        if (!array_key_exists($key, $this->data)) {
-            if ($restrict) {
-                throw new Exception('sub node does not exist. FIELD['.$key.']');
-            }
-            return self::fromArray([]);
-        }
-        $arr = $this->data[$key];
-        if (is_array($arr)) {
-            return self::fromArray($arr);
-        }
-        if (is_object($arr)) {
-            return self::fromArray((array)$arr);
-        }
-        throw new Exception('type error, expects array or object. FIELD[' . $key.']');
     }
 
     /**
@@ -121,7 +107,7 @@ class Bean
         if (is_int($value) || is_float($value) || is_bool($value)) {
             return strval($value);
         }
-        throw new Exception('type error, field: ' . $key);
+        throw new TypeErrorException('type error, field: ' . $key);
     }
 
     public function int($key, $default = null)
@@ -147,14 +133,14 @@ class Bean
             return intval($value);
         }
 
-        throw new Exception('type error, field: ' . $key);
+        throw new TypeErrorException('type error, field: ' . $key);
     }
 
     /**
      * @param $key
      * @param mixed $default
      * @return float|null
-     * @throws Exception
+     * @throws TypeErrorException
      */
     public function float($key, $default = null)
     {
@@ -179,14 +165,14 @@ class Bean
             return floatval($value);
         }
 
-        throw new Exception('type error, field: ' . $key);
+        throw new TypeErrorException('type error, field: ' . $key);
     }
 
     /**
      * @param $key
      * @param mixed $default
      * @return bool|null
-     * @throws Exception
+     * @throws TypeErrorException
      */
     public function bool($key, $default = null)
     {
@@ -214,7 +200,7 @@ class Bean
             return boolval($value);
         }
 
-        throw new Exception('type error, field: ' . $key);
+        throw new TypeErrorException('type error, field: ' . $key);
     }
 
     /**
@@ -273,10 +259,5 @@ class Bean
         return $value;
     }
 
-    /**
-     * @return array
-     */
-    public function rawData() {
-        return $this->data;
-    }
+
 }

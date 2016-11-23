@@ -28,14 +28,14 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testFromJsonFile()
     {
-        $jsonFile = __DIR__.'/conf.json';
+        $jsonFile = __DIR__ . '/bean.json';
         $conf = Loader::fromJsonFile($jsonFile);
         $this->assertInstanceOf(Bean::class, $conf);
         $this->assertEquals('1', $conf->strictStr('b'));
     }
 
     /**
-     * @expectedException \Comos\Drapper\Exception
+     * @expectedException \Comos\Drapper\Exceptions\Exception
      * @expectedExceptionMessage cannot find the conf file
      */
     public function testFromJsonFile_CannotFindFile()
@@ -44,7 +44,7 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
         Loader::fromJsonFile($jsonFile);
     }
     /**
-     * @expectedException \Comos\Drapper\Exception
+     * @expectedException \Comos\Drapper\Exceptions\Exception
      * @expectedExceptionMessage cannot read conf file
      */
     public function testFromJsonFile_FailToReadFile()
@@ -52,7 +52,7 @@ class LoaderTest extends \PHPUnit_Framework_TestCase
         Loader::fromJsonFile($this->unreadableJsonFile);
     }
     /**
-     * @expectedException \Comos\Drapper\Exception
+     * @expectedException \Comos\Drapper\Exceptions\Exception
      * @expectedExceptionMessage bad format
      */
     public function testFromJsonFile_BadFormat()

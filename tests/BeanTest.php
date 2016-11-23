@@ -8,6 +8,8 @@
 
 namespace Comos\Drapper;
 
+use Comos\Drapper\Exceptions\Exception;
+
 class BeanTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -18,7 +20,7 @@ class BeanTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Comos\Drapper\Exceptions\TypeErrorException
      */
     public function testFromArray_InvalidArgument()
     {
@@ -47,15 +49,18 @@ class BeanTest extends \PHPUnit_Framework_TestCase
             ['str', ['a', 'b', 'c'], 2, null, 'c'],
             ['str', ['a', 'b', 'c'], '2', null, 'c'],
             ['int', ['a' => 1], 'a', null, 1],
+            ['int', ['a' => null], 'a', null, null],
             ['int', ['a' => 1.0], 'a', null, 1],
             ['int', ['a' => "1.0"], 'a', null, 1],
             ['int', ['a' => "1.0"], 'b', null, null],
             ['float', ['a' => "1.0"], 'a', null, 1.0],
+            ['float', ['a' => null], 'a', null, null],
             ['float', ['a' => "1.0"], 'b', 1.1, 1.1],
             ['float', ['c' => 2], 'c', 1.1, 2.0],
             ['float', ['c' => 2], 'c', 1.1, 2.0],
             ['float', ['c' => 0], 'c', 1.1, 0.0],
             ['bool', ['c' => 0], 'c', null, false],
+            ['bool', ['c' => null], 'c', null, null],
             ['bool', ['c' => 'true'], 'c', null, true],
             ['bool', ['c' => true], 'c', null, true],
             ['bool', ['c' => 1], 'c', null, true],
@@ -67,7 +72,7 @@ class BeanTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider dataProviderForTestGetParamMethods_TypeError
-     * @expectedException Exception
+     * @expectedException \Comos\Drapper\Exceptions\TypeErrorException
      * @expectedExceptionMessage type error
      */
     public function testGetParamMethods_TypeError($method, $data, $key)
@@ -78,6 +83,7 @@ class BeanTest extends \PHPUnit_Framework_TestCase
     public function dataProviderForTestGetParamMethods_TypeError()
     {
         return [
+            ['str', ['a' => new \stdClass()], 'a'],
             ['strictInt', ['a' => 'x'], 'a'],
             ['strictInt', ['a' => []], 'a'],
             ['int', ['a' => false], 'a'],
@@ -92,15 +98,15 @@ class BeanTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getParamMethodsProvider_RestrictMode_MissRequiredField_DataProvider
+     * @dataProvider getParamMethodsProvider_StrictMode_MissRequiredField_DataProvider
      * @expectedException Exception
      */
-    public function testGetParamMethods_RestrictMode_MissRequiredField($method, $data, $key)
+    public function testGetParamMethods_StrictMode_MissRequiredField($method, $data, $key)
     {
         Bean::fromArray($data)->$method($key);
     }
 
-    public function getParamMethodsProvider_RestrictMode_MissRequiredField_DataProvider()
+    public function getParamMethodsProvider_StrictMode_MissRequiredField_DataProvider()
     {
         return [
             //$method, $data, $key
@@ -168,7 +174,7 @@ class BeanTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(true, $conf->sub('e')->bool('f'));
     }
 
-    public function testRsub()
+    public function testStrictSub()
     {
         $data = [
             'a' => 1,
@@ -176,20 +182,20 @@ class BeanTest extends \PHPUnit_Framework_TestCase
             'c' => ['a' => 1, 'b' => ['x' => 1, 'y' => 3]],
             'd' => null,
         ];
-        $conf = Bean::fromArray($data);
-        $this->assertTrue($conf->strictSub('b') === $conf->strictSub('b'));
-        $this->assertEquals('2', $conf->strictSub('b')->str(0));
-        $this->assertEquals('3', $conf->strictSub('c')->strictSub('b')->str('y'));
+        $bean = Bean::fromArray($data);
+        $this->assertTrue($bean->strictSub('b') === $bean->strictSub('b'));
+        $this->assertEquals('2', $bean->strictSub('b')->str(0));
+        $this->assertEquals('3', $bean->strictSub('c')->strictSub('b')->str('y'));
 
         try {
-            $conf->strictSub('a');
+            $bean->strictSub('a');
             $this->fail('expects Exception');
         } catch (Exception $ex) {
             $this->assertEquals('type error, expects array or object. FIELD[a]', $ex->getMessage());
         }
 
         try {
-            $conf->strictSub('x');
+            $bean->strictSub('x');
             $this->fail('expects Exception');
         } catch (Exception $ex) {
             $this->assertEquals('sub node does not exist. FIELD[x]', $ex->getMessage());
@@ -216,6 +222,24 @@ class BeanTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['x'=>'y'], $conf->sub('b')->rawData());
     }
 
+    public function testCollection()
+    {
+        $data = [
+            'c' => [
+                [
+                    'id' => 1,
+                    'name' => 'n1',
+                ],
+                [
+                    'id' => 2,
+                    'name' => 'n2',
+                ]
+            ]
+        ];
+        $bean = Bean::fromArray($data);
+        $collection = $bean->collection('c');
+        $this->assertInstanceOf(Collection::class, $collection);
+    }
 }
 
 class __StringObj {

@@ -1,8 +1,19 @@
 # Comos Drapper
 
-Drapper means Data-Wrapper.
+## Introduction
 
-The purpose of the project is to simplify PHP data accessing.
+Defensive programming is a good and important practice.
+It demands people to concern about input validations, data
+type conversations and error handling. It's not easy.
+Sometimes, it makes programs elephantine.
+Drapper means Data-Wrapper. Its purpose is to
+simplify PHP data accessing but strength the robust.
+It could be figured out by following scenarios.
+
+## Scenarios
+
+
+## Loading data from JSON file
 
 For example, we have an json file named alex.json like this.
 ```json
@@ -41,19 +52,57 @@ if (!is_string($gender) {
 ......
 
 It's elephantine.
-Fortunately, Drapper brings the change.
+If we use Drapper...
 
 ```
 use Comos\Drapper\Loader;
 $gender = Loader::fromJsonFile('alex.json')->str('gender', $defaultValue = 'private');
 ```
 
-Only two lines. Actually, you can use the full qualified class name to compress the codes to one line if you like.
+Only two lines. Even more you can use the full qualified class name to compress
+the codes to one line if you like.
 
-That's a one of scenarios those could satisfied by Drapper.
+In the scenario, Drapper checks existence, converts data type and handles defaulting strategy.
+If something is out of the fault-tolerant protocols, an exception would be thrown.
 
-Not only files, but also an array that we can wrapper directly.
+
+That's a one of scenarios. Actually, Drapper can do more.
+
+### To wrapper an array directly
+
 ```php
-use Comos\Drapper\Bean
+use Comos\Drapper\Bean;
 $data = ['id'=>3, 'name'=>'alex'];
 Bean::fromArray($data)->int('id');
+```
+
+### Reading field with default value
+
+```php
+use Comos\Drapper\Bean;
+
+$defaultValue = 0.1;
+$data = ['r0' => 0.2];
+$bean = Bean::fromArray($data);
+$r0 = $bean->float('r0', '');
+```
+
+## Integration
+
+Drapper is easy to be integrated to your applications
+ or libraries because of following reasons:
+
+1. Build with Composer.
+2. Follows the PSR-4.
+3. Lightweight, has no more dependencies.
+
+We recommend you to use Composer.
+That's the easiest way to integrate with drapper.
+
+```bash
+composer require comos/drapper
+```
+
+Or you could deploy Drapper to your include path.
+ Then register a PSR-4 autoload callback to your application.
+ See [PHP-FIG](http://php-fig.org).

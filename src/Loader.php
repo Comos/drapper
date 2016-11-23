@@ -9,6 +9,8 @@
 namespace Comos\Drapper;
 
 
+use Comos\Drapper\Exceptions\Exception;
+
 class Loader
 {
     /**

@@ -6,7 +6,7 @@
  * Time: 下午4:33
  */
 
-namespace Comos\Drapper;
+namespace Comos\Drapper\Exceptions;
 
 
 class Exception extends \Exception {
