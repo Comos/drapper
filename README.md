@@ -1,5 +1,7 @@
 # Comos Drapper
 
+[![Build Status](https://secure.travis-ci.org/Comos/drapper.png)](http://travis-ci.org/Comos/drapper)
+
 ## Introduction
 
 Defensive programming is a good and important practice.
@@ -15,7 +17,7 @@ It could be figured out by following scenarios.
 
 ## Loading data from JSON file
 
-For example, we have an json file named alex.json like this.
+For example, we have a json file named alex.json like this.
 ```json
 {
 "id":1,
@@ -102,6 +104,9 @@ That's the easiest way to integrate with drapper.
 ```bash
 composer require comos/drapper
 ```
+
+## More informations
+See [https://github.com/Comos/drapper/wiki](Wiki)
 
 Or you could deploy Drapper to your include path.
  Then register a PSR-4 autoload callback to your application.
